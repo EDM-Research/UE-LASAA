@@ -144,7 +144,7 @@ void UXRCalibration::changeCalibration()
 void UXRCalibration::loadFromFile()
 {
 	TArray<FString> outStrings;
-	FFileHelper::LoadANSITextFileToStrings(*FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() + "CalibrationData/" + filename), NULL, outStrings);
+	FFileHelper::LoadANSITextFileToStrings(*FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir() + "LASAA/" + filename), NULL, outStrings);
 
 	FMatrix mat;
 	int i = 0;
