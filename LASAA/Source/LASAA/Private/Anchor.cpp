@@ -186,6 +186,8 @@ int AAnchor::loadAnchors(UClass* extClass, UClass* anchorClass, AActor* newOwner
 				for(auto& it : results)
 				{
 					UE_LOG(LogTemp, Display, TEXT("Spawning with uuid: %s"), *it.UUID.ToString())
+					UE_LOG(LogTemp, Display, TEXT("Before spawning"))
+					// Log the extclass and anchorclass
 					// spawn the spatial anchor using the given class (must be derived from AAnchor class)
 					AActor* spawned = UOculusXRAnchorBPFunctionLibrary::SpawnActorWithAnchorQueryResults(
 						 newOwner->GetWorld(),
@@ -194,7 +196,7 @@ int AAnchor::loadAnchors(UClass* extClass, UClass* anchorClass, AActor* newOwner
 						nullptr,
 						nullptr,
 						ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
+					UE_LOG(LogTemp, Display, TEXT("After spawning"))
 					// cast to AAnchor and fill the uuid and gt external pose
 					AAnchor* spawnedAnchor = Cast<AAnchor>(spawned);
 					spawnedAnchor->setUuid(it.UUID.ToString());
