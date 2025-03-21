@@ -3,6 +3,20 @@
 This project contains a plug-and-play Unreal Engine 5 plugin for Large-area Spatially Aligned Anchors (LASAA). 
 The current version only supports Meta headsets. Other headsets can be integrated by changing the SDK and the code inside `LASAA/Source/LASAA/Private/Anchor.cpp` and `LASAA/Source/LASAA/Public/Anchor.h`.
 
+
+## Examples Videos
+
+### Approach
+[![Large Area Spatially Aligned Anchors](https://img.youtube.com/vi/2xleN8whWSI/0.jpg)](https://www.youtube.com/watch?v=2xleN8whWSI)
+
+### Stereopsia 2024
+[![Stereopsia 2024](https://img.youtube.com/vi/TntOdb3ymrY/0.jpg)](https://www.youtube.com/watch?v=TntOdb3ymrY)
+
+### On-site Visualizing of Building Information Models (BIM)
+[![Large Area AR for BIM visualisations and interactions](https://img.youtube.com/vi/CEKtPZjClpc/0.jpg)](https://www.youtube.com/watch?v=CEKtPZjClpc)
+
+
+
 ## Installation
 
 - Create a blank Unreal project for mobile or use an existing one (as always a blank one is the easiest, since there are no interfering dependencies). 
