@@ -19,13 +19,13 @@ The current version only supports Meta headsets. Other headsets can be integrate
 
 ## Installation
 
-- Create a blank Unreal project for mobile or use an existing one (as always a blank one is the easiest, since there are no interfering dependencies). 
 - Install the OculusXR plugin if developing for Meta devices. The following link contains a tutorial on how to set it up: https://developer.oculus.com/documentation/unreal/unreal-quick-start-guide-quest/.
+- Create a new Unreal project following the Meta documentation.
 - Enable the `MetaXR` and the `OSC` plugin.
 - In your project folder, create a folder called `Plugins` 
 - Download this repository as a zip file.
-- Copy the `LASAA` folder to the `Plugins` folder.
-- Restart your project and the plugin is automatically compiled. 
+- Copy to a `LASAA` folder in the `Plugins` folder.
+- Regenerate project files, restart your project and the plugin is automatically compiled. 
 - Change Gamemode to `AnchorGameMode`.
 - In the MetaXR plugin settings, enable anchor support and passthrough support and add your headset as a supported Meta Quest device. 
 - Make sure to add the `Prep` and `Operational` levels to your packaging in project settings. 
@@ -66,6 +66,8 @@ By default the Levels are configured to work only with the right controller:
 - Press `right thumbstick` once to change the opacity of the mesh.
 - Hold and release `right thumbstick` to change the interpolation mode from static to weighted and vice versa.
 
+> [!NOTE]  
+> At the moment the tracking is dependent on using an external camera to initialise the markers positions.
 
 ## About
 ![](/img/edm_logo.png) &nbsp;&nbsp;&nbsp;

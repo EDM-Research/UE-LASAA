@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Expertise centre for Digital Media, 2024. All Rights Reserved.
 
 #include "LASAA.h"
 
