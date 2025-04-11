@@ -3,9 +3,16 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "LASAA",
-	"Description": "",
+	"Description": "Plugin for Large-area Spatially Aligned Anchors (LASAA) tracking, to use with Meta headsets",
 	"Category": "Anchors",
-	"CreatedBy": "",
+	"CreatedBy": "Expertise centre for Digital Media",
+	"CreatedByURL": "https://www.uhasselt.be/en/edm",
+	"DocsURL": "https://github.com/EDM-Research/UE-LASAA",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"Installed": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
 	"CanContainContent": true,
 	"Modules": [
 		{
@@ -14,11 +21,10 @@
 			"LoadingPhase": "Default"
 		}
 	],
-	"CreatedByURL": "",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "",
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": false
+	"Plugins": [
+		{
+			"Name": "OculusXR",
+			"Enabled": true
+		}
+	]
 }
