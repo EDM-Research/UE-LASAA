@@ -1,8 +1,26 @@
 
-# UE-LASAA
+# UE-LASAA: Large-area Spatially Aligned Anchors
 This project contains a plug-and-play Unreal Engine 5 plugin for Large-area Spatially Aligned Anchors (LASAA). 
 The current version only supports Meta headsets. Other headsets can be integrated by changing the SDK and the code inside `LASAA/Source/LASAA/Private/Anchor.cpp` and `LASAA/Source/LASAA/Public/Anchor.h`.
 
+*Abstract: Extended Reality (XR) technologies, including Virtual Reality (VR) and Augmented Reality (AR), offer immersive experiences merging digital content with the real world. Achieving precise spatial tracking over large areas is a critical challenge in XR development. This paper addresses the drift issue, caused by small errors accumulating over time leading to a discrepancy between the real and virtual worlds. Tackling this issue is crucial for co-located XR experiences where virtual and physical elements interact seamlessly. Building upon the locally accurate spatial anchors, we propose a solution that extends this accuracy to larger areas by exploiting an external, drift-corrected tracking method as a ground truth. During the preparation stage, anchors are placed inside the headset and inside the external tracking method simultaneously, yielding 3D-3D correspondences. Both anchor clouds, and thus tracking methods, are aligned using a suitable cloud registration method during the operational stage. Our method enhances user comfort and mobility by leveraging the headset's built-in tracking capabilities during the operational stage, allowing standalone functionality. Additionally, this method can be used with any XR headset that supports spatial anchors and with any drift-free external tracking method. Empirical evaluation demonstrates the system's effectiveness in aligning virtual content with the real world and expanding the accurate tracking area. In addition, the alignment is evaluated by comparing the camera poses of both tracking methods. This approach may benefit a wide range of industries and applications, including manufacturing and construction, education, and entertainment.*
+
+## Bibtex
+```
+@inproceedings{10.1007/978-3-031-71707-9_3,
+  author = {Vanherck, Joni and Zoomers, Brent and Jorissen, Lode and Vandebroeck, Isjtar and Joris, Eric and Michiels, Nick},
+  title = {Large-Area Spatially Aligned Anchors},
+  year = {2024},
+  isbn = {978-3-031-71706-2},
+  publisher = {Springer-Verlag},
+  address = {Berlin, Heidelberg},
+  url = {https://doi.org/10.1007/978-3-031-71707-9_3},
+  doi = {10.1007/978-3-031-71707-9_3},
+  booktitle = {Extended Reality: International Conference, XR Salento 2024, Lecce, Italy, September 4–7, 2024, Proceedings, Part I},
+  pages = {42–60},
+  numpages = {19},
+}
+```
 
 ## Examples Videos
 
