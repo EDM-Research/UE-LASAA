@@ -25,6 +25,10 @@
 		{
 			"Name": "OculusXR",
 			"Enabled": true
+		},
+		{
+			"Name": "CameraPoseAruco",
+			"Enabled": true
 		}
 	]
 }
