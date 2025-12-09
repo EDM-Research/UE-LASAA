@@ -4,6 +4,8 @@
 #include <Eigen/Core>
 #include <sstream>
 
+#include "LASAAProjectSettings.h"
+
 using namespace Eigen;
 
 void UHelper::ConvertCoordinateSystem(FTransform& Transform, const EAxis SrcXInDstAxis, const EAxis SrcYInDstAxis, const EAxis SrcZInDstAxis)
@@ -89,6 +91,11 @@ FMatrix UHelper::eigenMatrixToUnreal(const Matrix4d& mat)
 Vector3d UHelper::unrealVectorToEigen(const FVector& vec)
 {
     return Vector3d(vec.X, vec.Y, vec.Z);
+}
+
+FString UHelper::GetMarkersFromSettings()
+{
+    return GetDefault<ULASAAProjectSettings>()->Markers;
 }
 
 

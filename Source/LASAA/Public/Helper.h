@@ -58,4 +58,7 @@ public:
 	static FVector eigenVectorToUnreal(const Vector3d& vec);
 	static FMatrix eigenMatrixToUnreal(const Matrix4d& mat);
 	static Vector3d unrealVectorToEigen(const FVector& vec);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAProjectSettings", BlueprintPure)
+	static FString GetMarkersFromSettings();
 };
