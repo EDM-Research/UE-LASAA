@@ -25,9 +25,9 @@ public class LASAA : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core","OculusXRAnchors", "Json", "JsonUtilities", "Eigen" ,
-				// --- Custom plugins
-				"CameraPoseAruco"
+				"Core","OculusXRAnchors", "Json", "JsonUtilities", "Eigen",
+				// --- Third party plugins
+				"AndroidCamera2Plugin"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -40,7 +40,9 @@ public class LASAA : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"DeveloperSettings"
+				"DeveloperSettings",
+				// Buit-in plugins
+				"OSC"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

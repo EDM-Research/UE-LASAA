@@ -27,7 +27,11 @@
 			"Enabled": true
 		},
 		{
-			"Name": "CameraPoseAruco",
+			"Name": "AndroidCamera2Plugin",
+			"Enabled": true
+		},
+		{
+			"Name": "OSC",
 			"Enabled": true
 		}
 	]

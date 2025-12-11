@@ -1,10 +1,18 @@
 // Copyright Expertise centre for Digital Media, 2024. All Rights Reserved.
 
 #include "Helper.h"
+#include "LASAAProjectSettings.h"
+
+// UE import
+#include "ImageUtils.h"
+#include "OSCManager.h"
+#include "OSCClient.h"
+#include "OSCMessage.h"
+
+// Third-party import
 #include <Eigen/Core>
 #include <sstream>
-
-#include "LASAAProjectSettings.h"
+#include "SimpleCamera2Test.h"
 
 using namespace Eigen;
 
@@ -93,11 +101,184 @@ Vector3d UHelper::unrealVectorToEigen(const FVector& vec)
     return Vector3d(vec.X, vec.Y, vec.Z);
 }
 
-FString UHelper::GetMarkersFromSettings()
+TArray<float> UHelper::GetCameraCalibration()
 {
-    return GetDefault<ULASAAProjectSettings>()->Markers;
+    const ESupportedCameraHardware CameraHardware = GetDefault<ULASAAProjectSettings>()->CameraHardware;
+    switch (CameraHardware)
+    {
+    case ESupportedCameraHardware::SCH_MetaQuest3:
+        return GetQuest3CameraCalibration();
+    case ESupportedCameraHardware::SCH_Unsupported:
+        return TArray<float>();
+    default:
+        return TArray<float>();
+    }
 }
 
+TArray<uint8> UHelper::GetCameraImageData()
+{
+    // Get camera texture
+    UTexture2D* CameraTexture = nullptr;
+    const ESupportedCameraHardware CameraHardware = GetDefault<ULASAAProjectSettings>()->CameraHardware;
+    switch (CameraHardware)
+    {
+    case ESupportedCameraHardware::SCH_MetaQuest3:
+        CameraTexture = USimpleCamera2Test::GetCameraTexture();
+        break;
+    case ESupportedCameraHardware::SCH_Unsupported:
+        return TArray<uint8>();
+    default:
+        return TArray<uint8>();
+    }
+
+    if (CameraTexture)
+    {
+        // Get image
+        FImage Image;
+        if (FImageUtils::GetTexture2DSourceImage(CameraTexture, Image))
+        {
+            // Get data
+            TArray64<uint8> ImageData;
+            if (FImageUtils::CompressImage(ImageData, TEXT("png"), Image))
+            {
+                TArray<uint8> ImageDataUE(ImageData);
+                return ImageDataUE;
+            }
+        }
+    }
+
+    return TArray<uint8>();
+}
+
+UOSCClient* UHelper::CreateProcessingDeviceOSCClient(UObject* Outer)
+{
+    const ULASAAProjectSettings* Settings = GetDefault<ULASAAProjectSettings>();
+    const FString IpAddress = Settings->ImageProcessingDeviceIPAddress;
+    const int32 Port = Settings->ImageProcessingDevicePort;
+
+    UOSCClient* MyClient = UOSCManager::CreateOSCClient(IpAddress, Port,
+        TEXT("ProcessingDeviceClient"), Outer);
+
+    return MyClient;
+}
+
+void UHelper::SendCameraCalibrationToClient(UOSCClient* Client, const TArray<float>& CameraCalibration)
+{
+    if (Client && CameraCalibration.Num() == 10)
+    {
+        FOSCMessage Message;
+        Message = UOSCManager::SetOSCMessageAddress(Message, 
+            UOSCManager::ConvertStringToOSCAddress(TEXT("/calibration")));
+
+        for (float Value : CameraCalibration)
+        {
+            UOSCManager::AddFloat(Message, Value);
+        }
+
+        Client->SendOSCMessage(Message);
+    }
+}
+
+TArray<float> UHelper::GetAndSendCameraCalibrationToClient(UOSCClient* Client)
+{
+    const TArray<float> CameraCalibration = GetCameraCalibration();
+    SendCameraCalibrationToClient(Client, CameraCalibration);
+    return CameraCalibration;
+}
+
+void UHelper::SendCameraImageDataToClient(UOSCClient* Client, const TArray<uint8>& CameraImageData)
+{
+    if (Client && !CameraImageData.IsEmpty())
+    {
+        FOSCMessage Message;
+        Message = UOSCManager::SetOSCMessageAddress(Message,
+            UOSCManager::ConvertStringToOSCAddress(TEXT("/imageData")));
+
+        UOSCManager::AddBlob(Message, CameraImageData);
+
+        Client->SendOSCMessage(Message);
+    }
+}
+
+TArray<uint8> UHelper::GetAndSendCameraImageDataToClient(UOSCClient* Client)
+{
+    const TArray<uint8> CameraImageData = GetCameraImageData();
+    SendCameraImageDataToClient(Client, CameraImageData);
+    return CameraImageData;
+}
+
+bool UHelper::GetAnchorTransformFromOSCMessage(FOSCMessage Message, FTransform& AnchorTransform)
+{
+    AnchorTransform = FTransform();
+    
+    TArray<float> Values;
+    for (int i = 1; i < 17; i++)
+    {
+        float Value;
+        if (!UOSCManager::GetFloat(Message, i, Value))
+        {
+            return false;
+        }
+        Values.Add(Value);
+    }
+
+    FMatrix ValuesMatrix(
+        FPlane4d(Values[0], Values[1], Values[2], Values[3] * 100.),
+        FPlane4d(Values[4], Values[5], Values[6], Values[7] * 100.),
+        FPlane4d(Values[8], Values[9], Values[10], Values[11] * 100.),
+        FPlane4d(Values[12], Values[13], Values[14], Values[15])
+    );
+
+    AnchorTransform = ConvertOpenCVToUnreal(FTransform(ValuesMatrix.GetTransposed()));
+
+    return true;
+}
+
+void UHelper::SendRequestForAnchorPoseToClient(UOSCClient* Client)
+{
+    if (Client)
+    {
+        FOSCMessage Message;
+        Message = UOSCManager::SetOSCMessageAddress(Message,
+            UOSCManager::ConvertStringToOSCAddress(TEXT("/requestAnchorPose")));
+
+        UOSCManager::AddString(Message, TEXT("requestAnchorPose"));
+
+		Client->SendOSCMessage(Message);
+    }
+}
+
+TArray<float> UHelper::GetQuest3CameraCalibration()
+{
+    // Get distortion
+    TArray<float> Distortion = USimpleCamera2Test::GetLensDistortion();
+    if (Distortion.Num() < 5)
+    {
+        return TArray<float>();
+    }
+
+    // Get intrinsics
+    float Fx = USimpleCamera2Test::GetCameraFx();
+    float Fy = USimpleCamera2Test::GetCameraFy();
+    FVector2D PrincipalPoint = USimpleCamera2Test::GetPrincipalPoint();
+    float Cx = PrincipalPoint.X;
+    float Cy = PrincipalPoint.Y;
+    float Skew = USimpleCamera2Test::GetCameraSkew();
+
+    // Apply scale
+    FIntPoint CalibResolution = USimpleCamera2Test::GetCalibrationResolution();
+    FIntPoint OriginalResolution = USimpleCamera2Test::GetOriginalResolution();
+    double ScaleX = static_cast<double>(CalibResolution.X) / OriginalResolution.X;
+    double ScaleY = static_cast<double>(CalibResolution.Y) / OriginalResolution.Y;
+    Fx *= ScaleX;
+    Cx *= ScaleX;
+    Fy *= ScaleY;
+    Cy *= ScaleY;
+
+    TArray<float> Calibration({ Fx, Fy, Cx, Cy, Skew });
+    Calibration.Append(Distortion);
+    return Calibration;
+}
 
 //FString UHelper::EigenToString(const MatrixXd mat)
 //{

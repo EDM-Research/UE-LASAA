@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include "SupportedCameraHardware.h"
+
+// UE include
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 
@@ -20,8 +23,19 @@ public:
 
 	ULASAAProjectSettings();
 
-	/** Save info */
+	/** Hardware info */
 
-	UPROPERTY(EditAnywhere, Config, Category = Markers, meta = (DisplayName = "Content of markers file", MultiLine = true))
-	FString Markers = "";
+	UPROPERTY(EditAnywhere, Config, Category = Hardware, meta = (DisplayName = "IP address of device handling image processing"))
+	FString ImageProcessingDeviceIPAddress = TEXT("0.0.0.0");
+
+	UPROPERTY(EditAnywhere, Config, Category = Hardware, meta = (DisplayName = "Port of device handling image processing"))
+	int32 ImageProcessingDevicePort = 8000;
+
+	UPROPERTY(EditAnywhere, Config, Category = Hardware, meta = (DisplayName = "Camera Hardware"))
+	ESupportedCameraHardware CameraHardware = ESupportedCameraHardware::SCH_MetaQuest3;
+
+	// Keep markers in a file for now
+	// TODO - restore when onpencv integration is ok
+	//UPROPERTY(EditAnywhere, Config, Category = Markers, meta = (DisplayName = "Content of markers file", MultiLine = true))
+	//FString Markers = "";
 };

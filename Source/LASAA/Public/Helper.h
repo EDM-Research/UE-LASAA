@@ -9,6 +9,9 @@
 
 using namespace Eigen;
 
+class UOSCClient;
+struct FOSCMessage;
+
 /**
  * Helper library with several convert functions, requires Eigen
  */
@@ -59,6 +62,34 @@ public:
 	static FMatrix eigenMatrixToUnreal(const Matrix4d& mat);
 	static Vector3d unrealVectorToEigen(const FVector& vec);
 
-	UFUNCTION(BlueprintCallable, Category = "LASAAProjectSettings", BlueprintPure)
-	static FString GetMarkersFromSettings();
+	/** return array [fx, fy, cx, cy, skew, k1, k2, p1, p2, k3] */
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions", BlueprintPure)
+	static TArray<float> GetCameraCalibration();
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions", BlueprintPure)
+	static TArray<uint8> GetCameraImageData();
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static UOSCClient* CreateProcessingDeviceOSCClient(UObject* Outer = nullptr);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static void SendCameraCalibrationToClient(UOSCClient* Client, const TArray<float>& CameraCalibration);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static TArray<float> GetAndSendCameraCalibrationToClient(UOSCClient* Client);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static void SendCameraImageDataToClient(UOSCClient* Client, const TArray<uint8>& CameraImageData);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static TArray<uint8> GetAndSendCameraImageDataToClient(UOSCClient* Client);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static UPARAM(DisplayName = "Succeeded") bool GetAnchorTransformFromOSCMessage(FOSCMessage Message, FTransform& AnchorTransform);
+
+	UFUNCTION(BlueprintCallable, Category = "LASAAHelperFunctions")
+	static void SendRequestForAnchorPoseToClient(UOSCClient* Client);
+
+private:
+	static TArray<float> GetQuest3CameraCalibration();
 };
