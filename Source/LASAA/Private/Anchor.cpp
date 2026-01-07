@@ -118,15 +118,19 @@ void AAnchor::readFromJson()
 {
 	FString out;
 	FFileHelper::LoadFileToString(out, *filePath);
-	
+	readFromJsonBuffer(out);
+}
+
+void AAnchor::readFromJsonBuffer(const FString& jsonString)
+{
 	TSharedPtr<FJsonObject> jObj;
-	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(out);
-	if(!FJsonSerializer::Deserialize(reader, jObj))
+	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
+	if (!FJsonSerializer::Deserialize(reader, jObj))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Can not create json from this string"));
 		return;
 	}
-	FJsonObjectConverter::JsonObjectToUStruct(jObj.ToSharedRef(), FAnchorStruct::StaticStruct(), &anchorStorage, 0,0);
+	FJsonObjectConverter::JsonObjectToUStruct(jObj.ToSharedRef(), FAnchorStruct::StaticStruct(), &anchorStorage, 0, 0);
 }
 
 void AAnchor::erase()
@@ -154,13 +158,8 @@ void AAnchor::erase()
 		}), result);
 }
 
-int AAnchor::loadAnchors(UClass* extClass, UClass* anchorClass, AActor* newOwner)
+int AAnchor::loadAnchorsInternal(UClass* extClass, UClass* anchorClass, AActor* newOwner)
 {
-	UE_LOG(LogTemp, Display, TEXT("Loading anchors from %s"), *filePath);
-
-	// read anchor uuids and external poses from JSON file into anchorStorage
-	readFromJson();
-
 	uint32 maxToLoad = 64;
 
 	// obtain uuids
@@ -173,45 +172,65 @@ int AAnchor::loadAnchors(UClass* extClass, UClass* anchorClass, AActor* newOwner
 	}
 
 	UE_LOG(LogTemp, Display, TEXT("%d UUIDS loaded"), uuids.Num());
-	
+
 	// Query the anchors with the uuids from anchorStorage
 	EOculusXRAnchorResult::Type result;
 	OculusXRAnchors::FOculusXRAnchors::QueryAnchors(uuids, queryLocation,
 		FOculusXRAnchorQueryDelegate::CreateLambda([extClass, anchorClass, newOwner](EOculusXRAnchorResult::Type result, const TArray<FOculusXRSpaceQueryResult>& results)
-		{
-			// if query successfull
-			if(result == EOculusXRAnchorResult::Success)
 			{
-				// create each of the anchors
-				for(auto& it : results)
+				// if query successfull
+				if (result == EOculusXRAnchorResult::Success)
 				{
-					UE_LOG(LogTemp, Display, TEXT("Spawning with uuid: %s"), *it.UUID.ToString())
-					UE_LOG(LogTemp, Display, TEXT("Before spawning"))
-					// Log the extclass and anchorclass
-					// spawn the spatial anchor using the given class (must be derived from AAnchor class)
-					AActor* spawned = UOculusXRAnchorBPFunctionLibrary::SpawnActorWithAnchorQueryResults(
-						 newOwner->GetWorld(),
-						it,
-						anchorClass,
-						nullptr,
-						nullptr,
-						ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					UE_LOG(LogTemp, Display, TEXT("After spawning"))
-					// cast to AAnchor and fill the uuid and gt external pose
-					AAnchor* spawnedAnchor = Cast<AAnchor>(spawned);
-					spawnedAnchor->setUuid(it.UUID.ToString());
-					spawnedAnchor->setGtExtPose(anchorStorage.getTransform(it.UUID.ToString()));
+					// create each of the anchors
+					for (auto& it : results)
+					{
+						UE_LOG(LogTemp, Display, TEXT("Spawning with uuid: %s"), *it.UUID.ToString())
+							UE_LOG(LogTemp, Display, TEXT("Before spawning"))
+							// Log the extclass and anchorclass
+							// spawn the spatial anchor using the given class (must be derived from AAnchor class)
+							AActor* spawned = UOculusXRAnchorBPFunctionLibrary::SpawnActorWithAnchorQueryResults(
+								newOwner->GetWorld(),
+								it,
+								anchorClass,
+								nullptr,
+								nullptr,
+								ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+						UE_LOG(LogTemp, Display, TEXT("After spawning"))
+							// cast to AAnchor and fill the uuid and gt external pose
+							AAnchor* spawnedAnchor = Cast<AAnchor>(spawned);
+						spawnedAnchor->setUuid(it.UUID.ToString());
+						spawnedAnchor->setGtExtPose(anchorStorage.getTransform(it.UUID.ToString()));
 
-					// also spawn the external anchor in relation to the anchor parent
-					AActor* extAnchor = newOwner->GetWorld()->SpawnActor<AActor>(extClass);
-					extAnchor->SetActorTransform(anchorStorage.getTransform(it.UUID.ToString()));
-					extAnchor->AttachToActor(newOwner, FAttachmentTransformRules::KeepRelativeTransform);
-					spawnedAnchor->setExtPairAndCalibrationOffset(extAnchor);
+						// also spawn the external anchor in relation to the anchor parent
+						AActor* extAnchor = newOwner->GetWorld()->SpawnActor<AActor>(extClass);
+						extAnchor->SetActorTransform(anchorStorage.getTransform(it.UUID.ToString()));
+						extAnchor->AttachToActor(newOwner, FAttachmentTransformRules::KeepRelativeTransform);
+						spawnedAnchor->setExtPairAndCalibrationOffset(extAnchor);
+					}
 				}
-			}
-		}), result
-		);
+			}), result
+	);
 	return uuids.Num();
+}
+
+int AAnchor::loadAnchors(UClass* extClass, UClass* anchorClass, AActor* newOwner)
+{
+	UE_LOG(LogTemp, Display, TEXT("Loading anchors from %s"), *filePath);
+
+	// read anchor uuids and external poses from JSON file into anchorStorage
+	readFromJson();
+
+	return loadAnchorsInternal(extClass, anchorClass, newOwner);
+}
+
+int AAnchor::loadAnchorsFromBuffer(const FString& jsonString, UClass* extClass, UClass* anchorClass, AActor* newOwner)
+{
+	UE_LOG(LogTemp, Display, TEXT("Loading anchors from buffer"));
+
+	// read anchor uuids and external poses from JSON buffer into anchorStorage
+	readFromJsonBuffer(jsonString);
+
+	return loadAnchorsInternal(extClass, anchorClass, newOwner);
 }
 
 // delete all anchors, TODO erase anchors

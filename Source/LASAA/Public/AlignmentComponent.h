@@ -45,6 +45,9 @@ public:
 	// should component tick or not
 	bool tick = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "AnchorFunctions")
+	FString anchorBuffer = "";
+
 private:
 	// indicates whether the anchors are localized
 	bool localizedAnchors = false;

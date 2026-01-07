@@ -75,6 +75,9 @@ public:
 	// load anchors from storage
 	UFUNCTION(BlueprintCallable, Category="AnchorFunctions")
 	static int loadAnchors(UClass* extClass, UClass* anchorClass,AActor* newOwner);
+	// load anchors from json string instead of file
+	UFUNCTION(BlueprintCallable, Category = "AnchorFunctions")
+	static int loadAnchorsFromBuffer(const FString& jsonString, UClass* extClass, UClass* anchorClass, AActor* newOwner);
 	// delete all anchors
 	UFUNCTION(BlueprintCallable, Category="AnchorFunctions")
 	static void resetAnchors();	
@@ -113,6 +116,8 @@ private:
 	
 	static void writeToJson();
 	static void readFromJson();
+	static void readFromJsonBuffer(const FString& jsonString);
+	static int loadAnchorsInternal(UClass* extClass, UClass* anchorClass, AActor* newOwner);
 
 	inline static FTransform cam2xr = FTransform::Identity;
 

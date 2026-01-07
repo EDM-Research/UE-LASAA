@@ -27,7 +27,8 @@ void UAlignmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 		if(numAnchorsToLoad < 0)
 		{
-			numAnchorsToLoad = AAnchor::loadAnchors(this->extAnchorClass, this->intAnchorClass, this->GetOwner());
+			numAnchorsToLoad = anchorBuffer.IsEmpty() ? AAnchor::loadAnchors(this->extAnchorClass, this->intAnchorClass, this->GetOwner())
+				: AAnchor::loadAnchorsFromBuffer(anchorBuffer, this->extAnchorClass, this->intAnchorClass, this->GetOwner());
 		}
 		if (AAnchor::allAnchors.Num() < numAnchorsToLoad)
 			return;
