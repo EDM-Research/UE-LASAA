@@ -103,3 +103,11 @@ This project has received funding from the European Union's Horizon Europe Resea
 ## License
 LASAA is a open-sorce development by Hasselt University Expertise Centre for Digital Media  
 The client is licensed under [MIT](LICENSE). See [License file](LICENSE) for more details.
+
+## Future work
+
+### Getting rid of external camera
+
+Uses open-source plugin AndroidCamera2Plugin from [tark146](https://github.com/tark146/UnrealAndroidCamera2Plugin), fork from [sudotman](https://github.com/sudotman/UnrealAndroidCamera2Plugin), to access camera information (texture, characteristics).
+Opencv does not ship in Unreal for Android Meta Quest. Possible workarounds would to use another app on the Quest to handle image processing and marker detection, and communicate with Unreal app. Other option would be to use the Unity version and adapt existing project contents to work in Unity instead.
+
